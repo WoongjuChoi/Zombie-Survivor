@@ -74,7 +74,7 @@ public class Gun : MonoBehaviour {
 
             if (target != null)
             {
-                target.OnDamage(Damage, hit.point, hit.normal);
+                target.TakeDamage(Damage, hit.point, hit.normal);
             }
 
             hitPosition = hit.point;
@@ -124,9 +124,21 @@ public class Gun : MonoBehaviour {
     private IEnumerator ReloadRoutine() {
         // 현재 상태를 재장전 중 상태로 전환
         state = State.Reloading;
+
+        _gunAudioPlayer.PlayOneShot(reloadClip);
         
         // 재장전 소요 시간 만큼 처리를 쉬기
         yield return new WaitForSeconds(reloadTime);
+
+        int ammoToFill = MagCapacity - MagAmmo;
+
+        if (RemainedAmmo < ammoToFill)
+        {
+            ammoToFill = RemainedAmmo;
+        }
+
+        MagAmmo += ammoToFill;
+        RemainedAmmo -= ammoToFill;
 
         // 총의 현재 상태를 발사 준비된 상태로 변경
         state = State.Ready;
